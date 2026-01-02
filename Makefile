@@ -89,6 +89,12 @@ define Package/luci-app-pansou/description
 endef
 
 define Package/luci-app-pansou/install
+	$(INSTALL_DIR) $(1)/usr/share/luci/menu.d
+	$(INSTALL_DATA) ./luci/menu.d/luci-app-pansou.json $(1)/usr/share/luci/menu.d/
+
+	$(INSTALL_DIR) $(1)/usr/share/rpcd/acl.d
+	$(INSTALL_DATA) ./luci/rpcd/acl.d/luci-app-pansou.json $(1)/usr/share/rpcd/acl.d/
+
 	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/controller
 	$(INSTALL_DATA) ./luci/controller/pansou.lua $(1)/usr/lib/lua/luci/controller/
 

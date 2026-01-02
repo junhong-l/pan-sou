@@ -1,0 +1,11 @@
+{
+	"luci-app-pansou": {
+		"description": "Grant access to PanSou",
+		"read": {
+			"uci": [ "pansou" ]
+		},
+		"write": {
+			"uci": [ "pansou" ]
+		}
+	}
+}

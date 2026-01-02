@@ -2,16 +2,10 @@
 module("luci.controller.pansou", package.seeall)
 
 function index()
-	-- 检查是否有权限访问
-	if not nixio.fs.access("/etc/config/pansou") then
-		return
-	end
-
 	-- 创建主菜单入口
 	local page = entry({"admin", "services", "pansou"}, 
 		firstchild(), _("网盘搜索"), 60)
 	page.dependent = false
-	page.acl_depends = { "luci-app-pansou" }
 
 	-- 概览页面
 	entry({"admin", "services", "pansou", "overview"}, 

@@ -1,0 +1,36 @@
+{
+	"admin/services/pansou": {
+		"title": "网盘搜索",
+		"order": 60,
+		"action": {
+			"type": "firstchild"
+		},
+		"depends": {
+			"acl": [ "luci-app-pansou" ]
+		}
+	},
+	"admin/services/pansou/overview": {
+		"title": "概览",
+		"order": 1,
+		"action": {
+			"type": "template",
+			"path": "pansou/overview"
+		}
+	},
+	"admin/services/pansou/search": {
+		"title": "搜索",
+		"order": 2,
+		"action": {
+			"type": "template",
+			"path": "pansou/search"
+		}
+	},
+	"admin/services/pansou/config": {
+		"title": "设置",
+		"order": 3,
+		"action": {
+			"type": "cbi",
+			"path": "pansou/config"
+		}
+	}
+}
