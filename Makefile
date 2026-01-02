@@ -75,5 +75,31 @@ define Package/pansou-openwrt/install
 	$(INSTALL_DIR) $(1)/etc/pansou
 endef
 
+define Package/luci-app-pansou
+  SECTION:=luci
+  CATEGORY:=LuCI
+  SUBMENU:=3. Applications
+  TITLE:=LuCI support for PanSou
+  DEPENDS:=+pansou-openwrt +luci-base
+  PKGARCH:=all
+endef
+
+define Package/luci-app-pansou/description
+  LuCI web interface for PanSou network disk search engine.
+endef
+
+define Package/luci-app-pansou/install
+	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/controller
+	$(INSTALL_DATA) ./luci/controller/pansou.lua $(1)/usr/lib/lua/luci/controller/
+
+	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/model/cbi/pansou
+	$(INSTALL_DATA) ./luci/model/cbi/pansou/config.lua $(1)/usr/lib/lua/luci/model/cbi/pansou/
+
+	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/view/pansou
+	$(INSTALL_DATA) ./luci/view/pansou/overview.htm $(1)/usr/lib/lua/luci/view/pansou/
+	$(INSTALL_DATA) ./luci/view/pansou/search.htm $(1)/usr/lib/lua/luci/view/pansou/
+endef
+
 $(eval $(call GoBinPackage,pansou-openwrt))
 $(eval $(call BuildPackage,pansou-openwrt))
+$(eval $(call BuildPackage,luci-app-pansou))
