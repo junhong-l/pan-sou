@@ -11,7 +11,7 @@ PKG_VERSION:=1.0.0
 PKG_RELEASE:=1
 
 PKG_SOURCE_PROTO:=git
-PKG_SOURCE_URL:=https://github.com/your-repo/pansou-openwrt.git
+PKG_SOURCE_URL:=https://github.com/junhong-l/pan-sou.git
 PKG_SOURCE_VERSION:=HEAD
 PKG_MIRROR_HASH:=skip
 
@@ -33,7 +33,7 @@ define Package/pansou-openwrt
   SECTION:=net
   CATEGORY:=Network
   TITLE:=Network disk search engine for OpenWrt
-  URL:=https://github.com/your-repo/pansou-openwrt
+  URL:=https://github.com/junhong-l/pan-sou
   DEPENDS:=$(GO_ARCH_DEPENDS) +ca-bundle
 endef
 

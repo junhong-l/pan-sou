@@ -17,35 +17,47 @@
 
 ## OpenWrt编译
 
-### 1. 准备环境
+### 1. 克隆到OpenWrt源码
 
 ```bash
-# 安装Go 1.21+
-# 下载OpenWrt SDK
-wget https://downloads.openwrt.org/releases/24.10/targets/x86/64/openwrt-sdk-24.10-x86-64_gcc-13.3.0_musl.Linux-x86_64.tar.xz
-tar -xf openwrt-sdk-*.tar.xz
-```
+# 进入OpenWrt源码目录
+cd openwrt/package/
 
-### 2. 编译
-
-```bash
+# 克隆项目
 git clone https://github.com/junhong-l/pan-sou.git
-cd pan-sou
-
-# 设置SDK路径
-export OPENWRT_SDK_PATH=~/openwrt-sdk
-
-# 编译IPK包
-make -f Makefile.build build-all
-make -f Makefile.build ipk
 ```
 
-### 3. 生成文件
+### 2. 配置编译选项
 
-编译成功后，在 `dist/` 目录生成：
+```bash
+cd openwrt/
+
+# 更新feeds
+./scripts/feeds update -a
+./scripts/feeds install -a
+
+# 配置选择
+make menuconfig
+# 进入: Network -> pansou-openwrt [选中]
+# 进入: LuCI -> Applications -> luci-app-pansou [选中]
+```
+
+### 3. 编译
+
+```bash
+# 编译单个包
+make package/pan-sou/compile V=s
+
+# 或编译所有包
+make -j$(nproc)
+```
+
+### 4. 生成文件
+
+编译成功后，在 `bin/packages/你的架构/packages/` 目录生成：
 
 ```
-dist/
+bin/packages/x86_64/packages/
 ├── pansou-openwrt_1.0.0-1_x86_64.ipk        # 主程序包
 └── luci-app-pansou_1.0.0-1_all.ipk         # LuCI界面包
 ```
