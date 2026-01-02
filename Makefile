@@ -50,7 +50,12 @@ define Package/pansou-openwrt/conffiles
 endef
 
 define Build/Prepare
-	$(call Build/Prepare/Default)
+	mkdir -p $(PKG_BUILD_DIR)
+	$(CP) ./go.mod $(PKG_BUILD_DIR)/
+	$(CP) ./go.sum $(PKG_BUILD_DIR)/
+	$(CP) ./main.go $(PKG_BUILD_DIR)/
+	$(CP) ./config.yaml $(PKG_BUILD_DIR)/
+	$(CP) -r ./internal $(PKG_BUILD_DIR)/
 endef
 
 define Build/Compile
