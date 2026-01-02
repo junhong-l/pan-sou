@@ -10,11 +10,6 @@ PKG_NAME:=pansou-openwrt
 PKG_VERSION:=1.0.0
 PKG_RELEASE:=1
 
-PKG_SOURCE_PROTO:=git
-PKG_SOURCE_URL:=https://github.com/junhong-l/pan-sou.git
-PKG_SOURCE_VERSION:=HEAD
-PKG_MIRROR_HASH:=skip
-
 PKG_LICENSE:=GPL-2.0
 PKG_LICENSE_FILES:=LICENSE
 PKG_MAINTAINER:=YourName <your@email.com>
