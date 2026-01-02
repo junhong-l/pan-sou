@@ -1,0 +1,111 @@
+# PanSou OpenWrt - 编译脚本
+
+# 环境变量
+OPENWRT_SDK_PATH ?= $(HOME)/openwrt-sdk
+PACKAGE_NAME = pansou-openwrt
+LUCI_PACKAGE_NAME = luci-app-pansou
+
+# 架构列表
+ARCHS = x86_64 aarch64_generic arm_cortex-a9 mipsel_24kc
+
+.PHONY: all clean build-all prepare
+
+all: build-all
+
+# 准备源码
+prepare:
+	@echo "准备源码..."
+	mkdir -p dist
+	go mod download
+	go mod tidy
+
+# 为所有架构构建
+build-all: prepare
+	@for arch in $(ARCHS); do \
+		echo "构建 $$arch ..."; \
+		$(MAKE) build-arch ARCH=$$arch; \
+	done
+
+# 构建指定架构
+build-arch:
+	@echo "构建架构: $(ARCH)"
+	@if [ ! -d "$(OPENWRT_SDK_PATH)" ]; then \
+		echo "错误: OpenWrt SDK 路径不存在: $(OPENWRT_SDK_PATH)"; \
+		exit 1; \
+	fi
+	
+	# 复制Makefile到SDK
+	cp openwrt/Makefile $(OPENWRT_SDK_PATH)/package/$(PACKAGE_NAME)/
+	
+	# 复制源码
+	rsync -av --exclude='.git' --exclude='openwrt' --exclude='dist' \
+		./ $(OPENWRT_SDK_PATH)/package/$(PACKAGE_NAME)/src/
+	
+	# 编译
+	cd $(OPENWRT_SDK_PATH) && make package/$(PACKAGE_NAME)/compile V=s
+
+# 构建IPK包
+ipk: build-all
+	@echo "收集IPK包..."
+	mkdir -p dist
+	find $(OPENWRT_SDK_PATH)/bin -name "$(PACKAGE_NAME)*.ipk" -exec cp {} dist/ \;
+	find $(OPENWRT_SDK_PATH)/bin -name "$(LUCI_PACKAGE_NAME)*.ipk" -exec cp {} dist/ \;
+	@echo "IPK包已保存到 dist/ 目录"
+
+# 快速构建（不带交叉编译）
+quick:
+	@echo "快速构建本地版本..."
+	go build -o dist/pansou-openwrt \
+		-ldflags "-s -w -X main.Version=$(shell git describe --tags --always) -X main.BuildTime=$(shell date -u +%Y-%m-%dT%H:%M:%SZ)" \
+		.
+	@echo "构建完成: dist/pansou-openwrt"
+
+# 清理
+clean:
+	@echo "清理构建文件..."
+	rm -rf dist
+	go clean
+
+# 测试
+test:
+	go test -v ./...
+
+# 代码检查
+lint:
+	golangci-lint run
+
+# 格式化代码
+fmt:
+	go fmt ./...
+
+# 安装到本地系统（用于开发测试）
+install-local:
+	@echo "安装到本地系统..."
+	sudo cp dist/pansou-openwrt /usr/bin/
+	sudo cp openwrt/root/etc/init.d/pansou /etc/init.d/
+	sudo cp openwrt/root/etc/config/pansou /etc/config/
+	sudo chmod +x /usr/bin/pansou-openwrt
+	sudo chmod +x /etc/init.d/pansou
+	@echo "安装完成"
+
+# 显示帮助
+help:
+	@echo "PanSou OpenWrt 编译脚本"
+	@echo ""
+	@echo "可用目标:"
+	@echo "  make prepare          - 准备编译环境"
+	@echo "  make quick           - 快速构建本地版本"
+	@echo "  make build-all       - 构建所有架构的IPK"
+	@echo "  make ipk             - 收集所有IPK包"
+	@echo "  make clean           - 清理构建文件"
+	@echo "  make test            - 运行测试"
+	@echo "  make lint            - 代码检查"
+	@echo "  make fmt             - 格式化代码"
+	@echo "  make install-local   - 安装到本地系统"
+	@echo ""
+	@echo "环境变量:"
+	@echo "  OPENWRT_SDK_PATH    - OpenWrt SDK路径 (默认: ~/openwrt-sdk)"
+	@echo ""
+	@echo "示例:"
+	@echo "  make quick"
+	@echo "  make build-all OPENWRT_SDK_PATH=/path/to/sdk"

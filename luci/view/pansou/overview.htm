@@ -1,0 +1,143 @@
+<%+header%>
+
+<script type="text/javascript">
+	var status_interval;
+	
+	// 更新服务状态
+	function updateStatus() {
+		XHR.get('<%=url("admin/services/pansou/status")%>', null, function(x, data) {
+			var status_icon = document.getElementById('status_icon');
+			var status_text = document.getElementById('status_text');
+			
+			if (data.running) {
+				status_icon.className = 'label label-success';
+				status_text.innerText = '运行中';
+				document.getElementById('btn_start').disabled = true;
+				document.getElementById('btn_stop').disabled = false;
+				document.getElementById('btn_restart').disabled = false;
+			} else {
+				status_icon.className = 'label label-danger';
+				status_text.innerText = '已停止';
+				document.getElementById('btn_start').disabled = false;
+				document.getElementById('btn_stop').disabled = true;
+				document.getElementById('btn_restart').disabled = true;
+			}
+			
+			document.getElementById('autostart').innerText = 
+				data.enabled ? '已启用' : '未启用';
+			document.getElementById('pid').innerText = 
+				data.pid || '-';
+		});
+	}
+	
+	// 启动服务
+	function startService() {
+		XHR.get('<%=url("admin/services/pansou/start")%>', null, function(x, data) {
+			alert(data.message);
+			updateStatus();
+		});
+	}
+	
+	// 停止服务
+	function stopService() {
+		XHR.get('<%=url("admin/services/pansou/stop")%>', null, function(x, data) {
+			alert(data.message);
+			updateStatus();
+		});
+	}
+	
+	// 重启服务
+	function restartService() {
+		XHR.get('<%=url("admin/services/pansou/restart")%>', null, function(x, data) {
+			alert(data.message);
+			updateStatus();
+		});
+	}
+	
+	// 页面加载完成后启动定时更新
+	window.addEventListener('load', function() {
+		updateStatus();
+		status_interval = setInterval(updateStatus, 3000);
+	});
+	
+	// 页面卸载时清除定时器
+	window.addEventListener('unload', function() {
+		if (status_interval) {
+			clearInterval(status_interval);
+		}
+	});
+</script>
+
+<h2 name="content"><%:网盘搜索 - 概览%></h2>
+
+<fieldset class="cbi-section">
+	<legend><%:服务状态%></legend>
+	<table class="table">
+		<tr>
+			<td width="30%"><strong><%:当前状态%>:</strong></td>
+			<td>
+				<span id="status_icon" class="label"></span>
+				<span id="status_text">-</span>
+			</td>
+		</tr>
+		<tr>
+			<td><strong><%:开机自启%>:</strong></td>
+			<td id="autostart">-</td>
+		</tr>
+		<tr>
+			<td><strong><%:进程ID%>:</strong></td>
+			<td id="pid">-</td>
+		</tr>
+		<tr>
+			<td><strong><%:服务控制%>:</strong></td>
+			<td>
+				<button id="btn_start" class="btn btn-success" onclick="startService()">
+					<%:启动%>
+				</button>
+				<button id="btn_stop" class="btn btn-danger" onclick="stopService()">
+					<%:停止%>
+				</button>
+				<button id="btn_restart" class="btn btn-warning" onclick="restartService()">
+					<%:重启%>
+				</button>
+			</td>
+		</tr>
+	</table>
+</fieldset>
+
+<fieldset class="cbi-section">
+	<legend><%:快速链接%></legend>
+	<div class="cbi-value">
+		<ul>
+			<li><a href="<%=url("admin/services/pansou/search")%>"><%:搜索页面%></a></li>
+			<li><a href="<%=url("admin/services/pansou/config")%>"><%:服务配置%></a></li>
+			<li><a href="http://<%=luci.http.getenv("SERVER_ADDR")%>:8888" target="_blank"><%:直接访问API%></a></li>
+		</ul>
+	</div>
+</fieldset>
+
+<fieldset class="cbi-section">
+	<legend><%:使用说明%></legend>
+	<div class="cbi-value">
+		<p>
+			<strong>网盘搜索</strong>是一个开箱即用的网盘资源搜索工具，支持多个搜索源和Telegram频道搜索。
+		</p>
+		<p><strong>功能特点：</strong></p>
+		<ul>
+			<li>支持多个网盘搜索插件（小云搜索、喵搜、剧透社等）</li>
+			<li>支持Telegram频道搜索（需要网络能访问Telegram）</li>
+			<li>支持百度网盘、阿里云盘、夸克网盘、磁力链接等多种资源类型</li>
+			<li>支持搜索结果缓存，提高响应速度</li>
+			<li>支持自定义并发数、超时时间等参数</li>
+		</ul>
+		<p><strong>API使用示例：</strong></p>
+		<pre>
+# 搜索示例
+curl -X POST http://192.168.1.1:8888/api/search \
+  -H "Content-Type: application/json" \
+  -d '{"keyword":"电影名称","result_type":"merge"}'
+		</pre>
+	</div>
+</fieldset>
+
+<%+footer%>

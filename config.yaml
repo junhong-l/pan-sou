@@ -1,0 +1,111 @@
+# PanSou OpenWrt 配置文件
+
+# 服务配置
+server:
+  port: 8888
+  enabled: true
+  autostart: true
+
+# 搜索配置
+search:
+  # 并发数 (0表示自动)
+  concurrency: 5
+  # 搜索超时时间(秒)
+  timeout: 30
+  # 缓存过期时间(分钟)
+  cache_ttl: 60
+
+# Telegram配置
+telegram:
+  # 是否启用TG搜索
+  enabled: true
+  # 默认搜索的频道列表
+  channels:
+    - tgsearchers3
+  # TG网络检测超时(秒)
+  check_timeout: 5
+  # 代理设置 (可选，如: socks5://127.0.0.1:1080)
+  proxy: ""
+
+# 插件配置 - 不需要登录的插件
+plugins:
+  # 全局启用/禁用所有插件
+  enabled: true
+  
+  # 单个插件开关
+  list:
+    xys:
+      enabled: true
+      priority: 2
+    miaoso:
+      enabled: true
+      priority: 3
+    alupan:
+      enabled: true
+      priority: 2
+    mikuclub:
+      enabled: true
+      priority: 2
+    ypfxw:
+      enabled: true
+      priority: 3
+    kkmao:
+      enabled: true
+      priority: 3
+    jutoushe:
+      enabled: true
+      priority: 1
+    clxiong:
+      enabled: true
+      priority: 2
+    ash:
+      enabled: true
+      priority: 2
+    qingying:
+      enabled: true
+      priority: 3
+    meitizy:
+      enabled: true
+      priority: 3
+    wuji:
+      enabled: true
+      priority: 3
+    dyyj:
+      enabled: true
+      priority: 3
+    labi:
+      enabled: true
+      priority: 3
+    zxzj:
+      enabled: true
+      priority: 3
+    ddys:
+      enabled: true
+      priority: 3
+    lou1:
+      enabled: true
+      priority: 2
+    panyq:
+      enabled: true
+      priority: 1
+
+# 网盘类型过滤
+cloud_types:
+  enabled:
+    - baidu      # 百度网盘
+    - aliyun     # 阿里云盘
+    - quark      # 夸克网盘
+    - tianyi     # 天翼云盘
+    - uc         # UC网盘
+    - mobile     # 移动云盘
+    - 115        # 115网盘
+    - pikpak     # PikPak
+    - xunlei     # 迅雷网盘
+    - 123        # 123盘
+    - magnet     # 磁力链接
+    - ed2k       # ed2k链接
+
+# 日志配置
+logging:
+  level: info  # debug, info, warn, error
+  file: /var/log/pansou.log

@@ -1,0 +1,152 @@
+<%+header%>
+
+<script type="text/javascript">
+	var searching = false;
+	
+	// 执行搜索
+	function doSearch() {
+		if (searching) {
+			return;
+		}
+		
+		var keyword = document.getElementById('keyword').value.trim();
+		if (!keyword) {
+			alert('请输入搜索关键词');
+			return;
+		}
+		
+		searching = true;
+		document.getElementById('btn_search').disabled = true;
+		document.getElementById('search_results').innerHTML = 
+			'<div class="alert alert-info">搜索中，请稍候...</div>';
+		
+		XHR.post('<%=url("admin/services/pansou/search_api")%>', 
+			{keyword: keyword},
+			function(x, data) {
+				searching = false;
+				document.getElementById('btn_search').disabled = false;
+				
+				if (data.total === undefined) {
+					document.getElementById('search_results').innerHTML = 
+						'<div class="alert alert-danger">搜索失败，请检查服务是否正常运行</div>';
+					return;
+				}
+				
+				displayResults(data);
+			}
+		);
+	}
+	
+	// 显示搜索结果
+	function displayResults(data) {
+		var html = '';
+		
+		// 显示统计信息
+		html += '<div class="alert alert-success">';
+		html += '找到 <strong>' + data.total + '</strong> 条结果';
+		html += '，耗时 <strong>' + (data.search_time || 0).toFixed(2) + '</strong> 秒';
+		if (data.cache_hit) {
+			html += ' <span class="label label-info">缓存</span>';
+		}
+		html += '</div>';
+		
+		// 按网盘类型分组显示
+		if (data.merged_by_type) {
+			var typeNames = {
+				'baidu': '百度网盘',
+				'aliyun': '阿里云盘',
+				'quark': '夸克网盘',
+				'tianyi': '天翼云盘',
+				'xunlei': '迅雷网盘',
+				'115': '115网盘',
+				'pikpak': 'PikPak',
+				'123': '123盘',
+				'magnet': '磁力链接',
+				'ed2k': 'ed2k链接'
+			};
+			
+			for (var type in data.merged_by_type) {
+				var results = data.merged_by_type[type];
+				if (results.length === 0) continue;
+				
+				html += '<fieldset class="cbi-section">';
+				html += '<legend>' + (typeNames[type] || type) + ' (' + results.length + ')</legend>';
+				html += '<table class="table">';
+				html += '<tr><th width="50%">标题</th><th width="30%">链接</th><th>来源</th></tr>';
+				
+				results.forEach(function(item) {
+					html += '<tr>';
+					html += '<td><strong>' + escapeHtml(item.title) + '</strong>';
+					if (item.description) {
+						html += '<br><small>' + escapeHtml(item.description.substring(0, 100)) + '</small>';
+					}
+					html += '</td>';
+					
+					html += '<td>';
+					item.links.forEach(function(link) {
+						html += '<a href="' + link.url + '" target="_blank" class="btn btn-sm btn-primary">';
+						html += '打开链接</a> ';
+						if (link.password) {
+							html += '<code>' + link.password + '</code>';
+						}
+						html += '<br>';
+					});
+					html += '</td>';
+					
+					html += '<td><small>' + item.source + '</small></td>';
+					html += '</tr>';
+				});
+				
+				html += '</table>';
+				html += '</fieldset>';
+			}
+		}
+		
+		if (data.total === 0) {
+			html = '<div class="alert alert-warning">未找到相关资源</div>';
+		}
+		
+		document.getElementById('search_results').innerHTML = html;
+	}
+	
+	// HTML转义
+	function escapeHtml(text) {
+		var div = document.createElement('div');
+		div.innerText = text;
+		return div.innerHTML;
+	}
+	
+	// 回车搜索
+	document.addEventListener('DOMContentLoaded', function() {
+		document.getElementById('keyword').addEventListener('keypress', function(e) {
+			if (e.key === 'Enter') {
+				doSearch();
+			}
+		});
+	});
+</script>
+
+<h2 name="content"><%:网盘搜索%></h2>
+
+<fieldset class="cbi-section">
+	<legend><%:搜索%></legend>
+	<div class="cbi-value">
+		<label class="cbi-value-title"><%:关键词%></label>
+		<div class="cbi-value-field">
+			<input type="text" id="keyword" class="cbi-input-text" 
+				placeholder="输入要搜索的内容，如：电影名称、软件名称等" 
+				style="width: 60%; margin-right: 10px;" />
+			<button id="btn_search" class="btn btn-primary" onclick="doSearch()">
+				<%:搜索%>
+			</button>
+		</div>
+	</div>
+</fieldset>
+
+<div id="search_results">
+	<div class="alert alert-info">
+		请输入关键词开始搜索
+	</div>
+</div>
+
+<%+footer%>

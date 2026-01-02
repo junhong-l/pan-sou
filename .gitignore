@@ -1,0 +1,49 @@
+# 忽略编译产物
+dist/
+*.ipk
+*.tar.gz
+*.zip
+
+# Go相关
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+go.work
+vendor/
+
+# 日志文件
+*.log
+/var/log/
+
+# 配置文件备份
+*.bak
+*.tmp
+config.yaml.bak
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# OpenWrt
+/openwrt-sdk/
+/build_dir/
+/bin/
+/staging_dir/
+/tmp/
+/.config
+/.config.old
+
+# 测试覆盖率
+*.coverprofile
+coverage.out
+
+# 依赖
+go.sum.bak
